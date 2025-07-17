@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  --color-offpista-brown: #b55536;
+  --color-offpista-yellow: #dfbf3f;
+}
