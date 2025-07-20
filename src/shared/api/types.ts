@@ -1,0 +1,16 @@
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
+  status: number;
+}
+
+export interface ApiError {
+  message: string;
+  status?: number;
+  code?: string;
+}
+
+export interface RequestConfig {
+  headers?: Record<string, string>;
+  timeout?: number;
+}
