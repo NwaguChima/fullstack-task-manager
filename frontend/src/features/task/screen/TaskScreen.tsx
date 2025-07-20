@@ -1,9 +1,14 @@
-import React from "react";
+import Navbar from "../../../components/nav-bar/NavBar";
 
-interface TaskScreenProps {}
-
-const TaskScreen: React.FC<TaskScreenProps> = () => {
-  return <div>TaskScreen</div>;
-};
+function TaskScreen() {
+  return (
+    <div>
+      <Navbar
+        user={{ name: "Test Michael", email: "testermichael@gmail.com" }}
+        onLogout={() => {}}
+      />
+    </div>
+  );
+}
 
 export default TaskScreen;

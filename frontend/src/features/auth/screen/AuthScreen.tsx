@@ -12,7 +12,7 @@ interface AuthForm {
 }
 
 function AuthScreen() {
-  const user = "";
+  const user = "test";
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
 
