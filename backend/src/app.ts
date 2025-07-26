@@ -5,9 +5,9 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { xss } from 'express-xss-sanitizer';
 import authRoute from './routes/authRoute';
+import taskRoute from './routes/taskRoute';
 import AppError from './utils/appError';
 import globalErrorHandler from './controllers/errorController';
-import ExpressMongoSanitize from 'express-mongo-sanitize';
 
 const app: Application = express();
 
@@ -19,7 +19,7 @@ app.use(cors());
 app.use(express.json({ limit: '10kb' }));
 
 // Data sanitization middleware
-app.use(ExpressMongoSanitize());
+// app.use(expressMongoSanitize());
 app.use(xss());
 
 // Development logging
@@ -32,17 +32,51 @@ const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000, // 1 hour
   message: 'Too many requests from this IP, please try again in an hour',
-  standardHeaders: true,
-  legacyHeaders: false,
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
 app.use('/api', limiter);
 
+// Health check route
+app.get('/api/health', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Task Manager API is running!',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Routes
 app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/tasks', taskRoute);
+
+// API documentation route
+app.get('/api/v1', (req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Welcome to Task Manager API',
+    version: '1.0.0',
+    endpoints: {
+      auth: {
+        signup: 'POST /api/v1/auth/signup',
+        login: 'POST /api/v1/auth/login',
+      },
+      tasks: {
+        getAllTasks: 'GET /api/v1/tasks',
+        createTask: 'POST /api/v1/tasks',
+        getTask: 'GET /api/v1/tasks/:id',
+        updateTask: 'PATCH /api/v1/tasks/:id',
+        deleteTask: 'DELETE /api/v1/tasks/:id',
+        getInsights: 'GET /api/v1/tasks/insights',
+        bulkUpdate: 'PATCH /api/v1/tasks/bulk-update',
+      },
+    },
+  });
+});
 
 // Catch-all handler for undefined routes
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
+app.use('/', (req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
