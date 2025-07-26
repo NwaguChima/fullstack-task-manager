@@ -6,13 +6,14 @@ import { FormInput } from "../../../components/ui/input/FormInput";
 import { Button } from "../../../components/ui/button/Button";
 
 interface AuthForm {
+  name?: string;
   email: string;
   password: string;
   passwordConfirm?: string;
 }
 
 function AuthScreen() {
-  const user = "test";
+  const user = "";
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
 
@@ -70,6 +71,19 @@ function AuthScreen() {
             </div>
 
             <div className="flex flex-col gap-y-10 md:gap-y-5">
+              {!isLogin && (
+                <FormInput
+                  placeholder="Full Name"
+                  type="text"
+                  name="name"
+                  label="Name"
+                  registration={register("name", {
+                    required: "Name is required!",
+                  })}
+                  error={errors.name?.message}
+                />
+              )}
+
               <FormInput
                 placeholder="you@example.com"
                 type="email"

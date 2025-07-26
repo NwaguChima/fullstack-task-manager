@@ -12,6 +12,7 @@
 # Node dependencies
 /frontend/node_modules
 /backend/node_modules
+/backend/.eslintignore
 
 # Build output
 /frontend/dist
