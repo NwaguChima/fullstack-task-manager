@@ -1,4 +1,5 @@
 export const ROUTES = {
-  AUTH: "",
+  ROOT: "/",
   TASKS: "tasks",
+  AUTH: "auth",
 };

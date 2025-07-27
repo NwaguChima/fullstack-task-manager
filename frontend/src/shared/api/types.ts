@@ -1,7 +1,16 @@
 export interface ApiResponse<T> {
-  data: T;
+  status: "success" | "fail" | "error";
   message?: string;
-  status: number;
+  data?: T;
+  token?: string;
+  results?: number;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalTasks: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 export interface ApiError {

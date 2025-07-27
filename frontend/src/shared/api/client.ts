@@ -1,17 +1,18 @@
+// lib/apiClient.ts
 import axios, {
   AxiosError,
   type AxiosInstance,
   type AxiosRequestConfig,
   type AxiosResponse,
 } from "axios";
-import { type ApiResponse, type ApiError, type RequestConfig } from "./types";
+import type { ApiError, ApiResponse, RequestConfig } from "./types";
 
 class ApiClient {
   private instance: AxiosInstance;
   private baseURL: string;
 
   constructor(
-    baseURL: string = process.env.REACT_APP_API_URL ||
+    baseURL: string = import.meta.env.VITE_API_URL ||
       "http://localhost:8000/api",
   ) {
     this.baseURL = baseURL;
@@ -56,7 +57,10 @@ class ApiClient {
       (error) => {
         if (error.response?.status === 401) {
           localStorage.removeItem("authToken");
-          window.location.href = "/auth";
+          // Only redirect if not already on auth page
+          if (!window.location.pathname.includes("/auth")) {
+            window.location.href = "/auth";
+          }
         }
 
         if (process.env.NODE_ENV === "development") {
@@ -72,12 +76,13 @@ class ApiClient {
   }
 
   private normalizeError(
-    error: AxiosError<{ message: string; code: string }>,
+    error: AxiosError<{ message: string; error?: string; code?: string }>,
   ): ApiError {
     if (error.response) {
       return {
         message:
           error.response.data?.message ||
+          error.response.data?.error ||
           error.response.statusText ||
           "An error occurred",
         status: error.response.status,
@@ -95,12 +100,27 @@ class ApiClient {
     }
   }
 
-  private async request<T>(config: AxiosRequestConfig): Promise<T> {
+  // private async request<T>(config: AxiosRequestConfig): Promise<T> {
+  //   const response = await this.instance.request<ApiResponse<T>>(config);
+
+  //   // Handle different response structures
+  //   if (response.data.data) {
+  //     return response.data.data as T;
+  //   } else if (response.data.token && response.data.status === "success") {
+  //     return response.data as T;
+  //   } else {
+  //     return response.data as T;
+  //   }
+  // }
+
+  private async request<T>(
+    config: AxiosRequestConfig,
+  ): Promise<ApiResponse<T>> {
     const response = await this.instance.request<ApiResponse<T>>(config);
-    return (response.data.data ?? response.data) as T;
+    return response.data;
   }
 
-  async get<T>(url: string, config?: RequestConfig): Promise<T> {
+  async get<T>(url: string, config?: RequestConfig): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: "GET",
       url,
@@ -108,7 +128,11 @@ class ApiClient {
     });
   }
 
-  async post<T>(url: string, data?: T, config?: RequestConfig): Promise<T> {
+  async post<T>(
+    url: string,
+    data?: any,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: "POST",
       url,
@@ -117,7 +141,11 @@ class ApiClient {
     });
   }
 
-  async put<T>(url: string, data?: T, config?: RequestConfig): Promise<T> {
+  async put<T>(
+    url: string,
+    data?: any,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: "PUT",
       url,
@@ -126,7 +154,11 @@ class ApiClient {
     });
   }
 
-  async patch<T>(url: string, data?: T, config?: RequestConfig): Promise<T> {
+  async patch<T>(
+    url: string,
+    data?: any,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: "PATCH",
       url,
@@ -135,7 +167,10 @@ class ApiClient {
     });
   }
 
-  async delete<T>(url: string, config?: RequestConfig): Promise<T> {
+  async delete<T>(
+    url: string,
+    config?: RequestConfig,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({
       method: "DELETE",
       url,

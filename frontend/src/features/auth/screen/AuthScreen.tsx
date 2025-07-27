@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../../../components/ui/loader/Loader";
 import { FormInput } from "../../../components/ui/input/FormInput";
 import { Button } from "../../../components/ui/button/Button";
+import { useAuthStatus, useLogin, useSignup } from "../api/hooks/use-auth";
+import { ROUTES } from "../../../shared/constants/routes";
 
 interface AuthForm {
   name?: string;
@@ -13,32 +15,59 @@ interface AuthForm {
 }
 
 function AuthScreen() {
-  const user = "";
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+
+  const { isAuthenticated } = useAuthStatus();
+  const loginMutation = useLogin();
+  const signupMutation = useSignup();
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<AuthForm>();
 
   useEffect(() => {
-    if (user) {
-      navigate("/tasks");
+    if (isAuthenticated) {
+      navigate(ROUTES.ROOT);
     }
-  }, [user]);
+  }, [isAuthenticated, navigate]);
 
-  const handleLogin = () => {};
+  useEffect(() => {
+    reset();
+  }, [isLogin, reset]);
+
+  const handleFormSubmit = async (data: AuthForm) => {
+    if (!data.email || !data.password) return;
+
+    if (isLogin) {
+      loginMutation.mutate({
+        email: data.email,
+        password: data.password,
+      });
+    } else {
+      if (!data.name || !data.passwordConfirm) {
+        return;
+      }
+      signupMutation.mutate({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        passwordConfirm: data.passwordConfirm,
+      });
+    }
+  };
 
   const handleFormToggle = () => {
     setIsLogin(!isLogin);
   };
 
-  const isLoading = false;
-
+  const isLoading = loginMutation.isPending || signupMutation.isPending;
   const password = watch("password");
+
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-start bg-[#f3f4f6] from-[#302943] via-slate-900 to-black pt-36 md:justify-center md:pt-0 lg:flex-row dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]">
       <div className="flex w-full flex-col items-center justify-center gap-16 md:w-auto md:flex-row md:gap-40">
@@ -57,7 +86,7 @@ function AuthScreen() {
 
         <div className="flex w-full flex-col items-center justify-center p-4 md:w-1/3 md:p-1">
           <form
-            onSubmit={handleSubmit(handleLogin)}
+            onSubmit={handleSubmit(handleFormSubmit)}
             className="form-container flex w-full flex-col gap-y-8 bg-white px-10 pt-14 pb-14 md:w-[400px] dark:bg-slate-900"
           >
             <div>
@@ -79,6 +108,14 @@ function AuthScreen() {
                   label="Name"
                   registration={register("name", {
                     required: "Name is required!",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
+                    maxLength: {
+                      value: 50,
+                      message: "Name cannot exceed 50 characters",
+                    },
                   })}
                   error={errors.name?.message}
                 />
@@ -91,6 +128,10 @@ function AuthScreen() {
                 label="Email Address"
                 registration={register("email", {
                   required: "Email Address is required!",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Please enter a valid email address",
+                  },
                 })}
                 error={errors.email}
               />
@@ -101,6 +142,21 @@ function AuthScreen() {
                 label="Password"
                 registration={register("password", {
                   required: "Password is required!",
+                  minLength: {
+                    value: isLogin ? 1 : 8,
+                    message: isLogin
+                      ? "Password is required"
+                      : "Password must be at least 8 characters",
+                  },
+                  ...(isLogin
+                    ? {}
+                    : {
+                        pattern: {
+                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+                          message:
+                            "Password must contain at least one lowercase letter, one uppercase letter, and one number",
+                        },
+                      }),
                 })}
                 error={errors.password ? errors.password?.message : ""}
               />
@@ -120,12 +176,14 @@ function AuthScreen() {
                 />
               )}
             </div>
+
             {isLoading ? (
               <Loader />
             ) : (
               <Button
                 type="submit"
                 className="h-10 w-full rounded-full bg-blue-700 text-white"
+                disabled={isLoading}
               >
                 {isLogin ? "Login" : "Sign Up"}
               </Button>
@@ -137,7 +195,11 @@ function AuthScreen() {
                   ? "Don't have an account?"
                   : "Already have an account?"}
               </p>
-              <Button variant="link" onClick={handleFormToggle}>
+              <Button
+                variant="link"
+                onClick={handleFormToggle}
+                disabled={isLoading}
+              >
                 {isLogin ? "Sign Up" : "Login"}
               </Button>
             </div>
