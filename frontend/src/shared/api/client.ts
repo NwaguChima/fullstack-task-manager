@@ -100,19 +100,6 @@ class ApiClient {
     }
   }
 
-  // private async request<T>(config: AxiosRequestConfig): Promise<T> {
-  //   const response = await this.instance.request<ApiResponse<T>>(config);
-
-  //   // Handle different response structures
-  //   if (response.data.data) {
-  //     return response.data.data as T;
-  //   } else if (response.data.token && response.data.status === "success") {
-  //     return response.data as T;
-  //   } else {
-  //     return response.data as T;
-  //   }
-  // }
-
   private async request<T>(
     config: AxiosRequestConfig,
   ): Promise<ApiResponse<T>> {
