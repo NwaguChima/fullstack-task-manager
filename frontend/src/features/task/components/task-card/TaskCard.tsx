@@ -51,11 +51,6 @@ export const TaskCard = ({ task, onEdit }: TaskCardProps) => {
     });
   };
 
-  // const handleDelete = () => {
-  //   if (window.confirm("Are you sure you want to delete this task?")) {
-  //     deleteTaskMutation.mutate(task.id);
-  //   }
-  // };
   const handleDelete = () => {
     setShowConfirmDialog(true);
   };
