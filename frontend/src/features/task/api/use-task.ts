@@ -28,7 +28,7 @@ export const useTasks = (query: TaskQuery = {}) => {
 
       return apiClient.get<TasksResponse>(url);
     },
-    select: (data) => data.data,
+    select: (data) => data,
   });
 };
 

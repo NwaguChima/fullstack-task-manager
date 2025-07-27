@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { X } from "lucide-react";
 import {
   TaskStatus,
@@ -9,6 +9,14 @@ import {
 import { useCreateTask, useUpdateTask } from "../../api/use-task";
 import { FormInput } from "../../../../components/ui/input/FormInput";
 import { Button } from "../../../../components/ui/button/Button";
+import CustomSelect from "../../../../components/ui/select/CustomSelect";
+import { priorityOptions, statusOptions } from "./utils/options";
+
+type StatusOption = {
+  label: string;
+  value: TaskStatus;
+  color: string;
+};
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -38,6 +46,7 @@ export const CreateTaskModal = ({
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<TaskFormData>();
 
@@ -74,7 +83,6 @@ export const CreateTaskModal = ({
 
   const onSubmit = async (data: TaskFormData) => {
     setIsSubmitting(true);
-
     try {
       const taskData: CreateTaskRequest = {
         title: data.title.trim(),
@@ -176,28 +184,42 @@ export const CreateTaskModal = ({
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Status
             </label>
-            <select
-              {...register("status")}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            >
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <CustomSelect<StatusOption>
+                  {...field}
+                  options={statusOptions}
+                  value={
+                    statusOptions.find((opt) => opt.value === field.value) ??
+                    null
+                  }
+                  onChange={(option) => field.onChange(option?.value)}
+                />
+              )}
+            />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Priority
             </label>
-            <select
-              {...register("priority")}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+            <Controller
+              control={control}
+              name="priority"
+              render={({ field }) => (
+                <CustomSelect
+                  {...field}
+                  options={priorityOptions}
+                  value={
+                    priorityOptions.find((opt) => opt.value === field.value) ??
+                    null
+                  }
+                  onChange={(option) => field.onChange(option?.value)}
+                />
+              )}
+            />
           </div>
 
           <FormInput

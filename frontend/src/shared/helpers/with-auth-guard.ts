@@ -1,6 +1,7 @@
 import { createElement, useEffect, type FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStatus } from "../../features/auth/api/hooks/use-auth";
+import { ROUTES } from "../constants/routes";
 
 export function withAuthGuard<T>(Component: FC<any>) {
   return function WrappedComponent(props: T) {
@@ -9,7 +10,7 @@ export function withAuthGuard<T>(Component: FC<any>) {
 
     useEffect(() => {
       if (!isAuthenticated) {
-        navigate("/auth", { replace: true });
+        navigate(`/${ROUTES.AUTH}`, { replace: true });
       }
     }, [isAuthenticated, navigate]);
 

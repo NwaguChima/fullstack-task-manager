@@ -3,6 +3,7 @@ import Task, { TaskStatus } from '../models/taskModel';
 import catchAsync from '../utils/catchAsync';
 import AppError from '../utils/appError';
 import { CustomUserReq } from '../types/custom';
+import { Types } from 'mongoose';
 
 interface TaskRequestBody {
   title: string;
@@ -178,9 +179,11 @@ export const getTaskInsights = catchAsync(
   async (req: CustomUserReq, res: Response) => {
     const userId = req?.user?.id;
 
+    const userObject = new Types.ObjectId(userId as string);
+
     // Aggregate task statistics
     const insights = await Task.aggregate([
-      { $match: { user: userId } },
+      { $match: { user: userObject } },
       {
         $group: {
           _id: '$status',
@@ -189,6 +192,7 @@ export const getTaskInsights = catchAsync(
             $push: {
               id: '$_id',
               title: '$title',
+              status: '$status',
               createdAt: '$createdAt',
             },
           },
@@ -212,6 +216,7 @@ export const getTaskInsights = catchAsync(
       [TaskStatus.DONE]: [],
     };
 
+    console.log('insights', JSON.stringify(insights));
     insights.forEach((insight) => {
       statusCounts[insight._id as keyof typeof statusCounts] = insight.count;
       tasksByStatus[insight._id] = insight.tasks;

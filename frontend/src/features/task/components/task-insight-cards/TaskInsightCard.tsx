@@ -1,5 +1,6 @@
 import { CheckCircle, Clock, AlertCircle, TrendingUp } from "lucide-react";
 import { useTaskInsights } from "../../api/use-task";
+import { cn } from "../../../../lib/utils/cn";
 
 export const InsightCards = () => {
   const { data: insights, isLoading } = useTaskInsights();
@@ -63,7 +64,7 @@ export const InsightCards = () => {
   ];
 
   return (
-    <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       {cards.map((card, index) => {
         const Icon = card.icon;
         return (
@@ -73,7 +74,7 @@ export const InsightCards = () => {
           >
             <div className="mb-4 flex items-center justify-between">
               <div
-                className={`rounded-lg p-2 ${card.bgColor} dark:bg-slate-700`}
+                className={cn("rounded-lg p-2 dark:bg-slate-700", card.bgColor)}
               >
                 <Icon className={`h-5 w-5 ${card.color} dark:text-gray-300`} />
               </div>
@@ -93,6 +94,6 @@ export const InsightCards = () => {
           </div>
         );
       })}
-    </div>
+    </section>
   );
 };

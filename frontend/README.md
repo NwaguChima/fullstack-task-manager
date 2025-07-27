@@ -75,5 +75,6 @@ Lazy load in a larger app
 have a wildcard screen
 separate pages for creating and editing of a task
 better ui components
-
+better token management
+separate hook for every api call
  -->

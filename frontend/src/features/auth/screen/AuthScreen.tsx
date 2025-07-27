@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import Loader from "../../../components/ui/loader/Loader";
 import { FormInput } from "../../../components/ui/input/FormInput";
 import { Button } from "../../../components/ui/button/Button";
-import { useAuthStatus, useLogin, useSignup } from "../api/hooks/use-auth";
-import { ROUTES } from "../../../shared/constants/routes";
+import { useLogin, useSignup } from "../api/hooks/use-auth";
 
 interface AuthForm {
   name?: string;
@@ -15,10 +13,8 @@ interface AuthForm {
 }
 
 function AuthScreen() {
-  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
 
-  const { isAuthenticated } = useAuthStatus();
   const loginMutation = useLogin();
   const signupMutation = useSignup();
 
@@ -29,12 +25,6 @@ function AuthScreen() {
     reset,
     formState: { errors },
   } = useForm<AuthForm>();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(ROUTES.ROOT);
-    }
-  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     reset();

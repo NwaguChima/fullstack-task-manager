@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import type { TaskQuery, TaskStatus } from "../../../../types/tasks";
 import { Button } from "../../../../components/ui/button/Button";
+import { cn } from "../../../../lib/utils/cn";
 
 interface TaskFilterProps {
   currentFilter: TaskQuery["status"];
@@ -62,20 +63,22 @@ export const TaskFilter = ({
           <Button
             key={filter.key || "all"}
             onClick={() => onFilterChange(filter.key as TaskStatus)}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+            className={cn(
+              "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               isActive
                 ? `${filter.activeColor} text-white shadow-sm`
-                : `${filter.bgColor} ${filter.color} hover:shadow-sm dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600`
-            } `}
+                : `${filter.bgColor} ${filter.color} hover:shadow-sm dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600`,
+            )}
           >
             {isActive && <Check className="h-3 w-3" />}
             <span>{filter.label}</span>
             <span
-              className={`min-w-[20px] rounded-full px-1.5 py-0.5 text-center text-xs font-medium ${
+              className={cn(
+                "min-w-[20px] rounded-full px-1.5 py-0.5 text-center text-xs font-medium",
                 isActive
                   ? "bg-white/20 text-white"
-                  : "bg-white text-gray-600 dark:bg-slate-600 dark:text-gray-300"
-              } `}
+                  : "bg-white text-gray-600 dark:bg-slate-600 dark:text-gray-300",
+              )}
             >
               {filter.count}
             </span>

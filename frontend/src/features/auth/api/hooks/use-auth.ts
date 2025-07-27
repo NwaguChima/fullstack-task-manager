@@ -52,12 +52,13 @@ export const useLogout = () => {
     onSuccess: () => {
       queryClient.clear();
       toast.success("Logged out successfully");
-      navigate("/auth");
+      navigate(`/${ROUTES.AUTH}`);
     },
   });
 };
 
 export const useUser = () => {
+  // should be managed better, but this works as a quick work around.
   return useQuery<User | null>({
     queryKey: ["user"],
     queryFn: () => {
@@ -69,6 +70,7 @@ export const useUser = () => {
 };
 
 export const useAuthStatus = () => {
+  // would normally get the user from the backend, or send it back alongside the auth endpoints
   const { data: user } = useUser();
 
   return {
